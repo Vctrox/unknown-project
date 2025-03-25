@@ -1,5 +1,5 @@
 # app/database.py
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 import os
@@ -34,28 +34,13 @@ def get_engine(retry_count=5, delay=5):
     """
     for attempt in range(retry_count):
         try:
-            # Create an initial connection to the MySQL server
-            initial_engine = create_engine(
-                f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/mysql",
-                pool_pre_ping=True
-            )
-            
-            # Attempt to create database if not exists
-            create_database_if_not_exists(initial_engine)
-            
             # Create the final engine with the specific database
-            engine = create_engine(
-                SQLALCHEMY_DATABASE_URL,
-                pool_size=10,
-                max_overflow=20,
-                pool_timeout=30,
-                pool_recycle=1800,
-                pool_pre_ping=True
-            )
+            engine = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
+
             
             # Test connection
             with engine.connect() as connection:
-                connection.execute("SELECT 1")
+                connection.execute(text("SELECT 1"))
             
             return engine
         except Exception as e:
@@ -64,6 +49,7 @@ def get_engine(retry_count=5, delay=5):
                 time.sleep(delay)
             else:
                 raise
+
 
 # Create engine with retry mechanism
 engine = get_engine()

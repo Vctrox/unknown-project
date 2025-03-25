@@ -1,6 +1,6 @@
 # app/models.py
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from pydantic import BaseModel, EmailStr, constr
 
 Base = declarative_base()
@@ -41,4 +41,4 @@ class User(BaseModel):
     full_name: str
 
     class Config:
-        orm_mode = True
+        from_attributes  = True
