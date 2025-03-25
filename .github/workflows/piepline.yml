@@ -13,17 +13,20 @@ jobs:
     # Add MariaDB service
     services:
       mariadb:
-        image: mariadb:latest
+        image: mariadb:10.11  # Use a specific version
         ports:
           - 3306:3306
         env:
           MYSQL_ROOT_PASSWORD: rootpassword
           MYSQL_DATABASE: user_management
+          MYSQL_USER: testuser
+          MYSQL_PASSWORD: testpassword
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="mariadb-admin ping -h localhost -u root -p rootpassword"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
+          --restart=on-failure
     
     steps:
     - uses: actions/checkout@v4
@@ -36,7 +39,21 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y python3-dev default-libmysqlclient-dev build-essential
+        sudo apt-get install -y python3-dev default-libmysqlclient-dev build-essential mariadb-client
+    
+    - name: Wait for MariaDB to be ready
+      run: |
+        max_attempts=10
+        attempt=0
+        until mariadb -h localhost -u root -p rootpassword -e "SELECT 1" &> /dev/null; do
+          if [ $attempt -ge $max_attempts ]; then
+            echo "MariaDB did not become ready in time"
+            exit 1
+          fi
+          echo "Waiting for MariaDB to be ready... (attempt $attempt)"
+          sleep 5
+          ((attempt++))
+        done
     
     - name: Install dependencies
       run: |
@@ -45,8 +62,8 @@ jobs:
       
     - name: Configure database connection
       run: |
-        echo "DB_USERNAME=root" >> $GITHUB_ENV
-        echo "DB_PASSWORD=rootpassword" >> $GITHUB_ENV
+        echo "DB_USERNAME=testuser" >> $GITHUB_ENV
+        echo "DB_PASSWORD=testpassword" >> $GITHUB_ENV
         echo "DB_HOST=localhost" >> $GITHUB_ENV
         echo "DB_PORT=3306" >> $GITHUB_ENV
         echo "DB_NAME=user_management" >> $GITHUB_ENV
