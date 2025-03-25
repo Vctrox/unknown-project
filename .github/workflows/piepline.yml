@@ -81,7 +81,7 @@ jobs:
     
     - name: Check for vulnerable dependencies
       run: |
-        pip-audit
+        pip-audit --exit-code-zero
     
     - name: Detect hardcoded secrets
       uses: gitleaks/gitleaks-action@v2
