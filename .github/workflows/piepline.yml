@@ -41,7 +41,7 @@ jobs:
     
     - name: Wait for MariaDB to be ready
       run: |
-        max_attempts=15
+        max_attempts=10
         attempt=0
         while ! mariadb -h 127.0.0.1 -u root -prootpassword -e "SELECT 1" &> /dev/null; do
           if [ $attempt -ge $max_attempts ]; then
@@ -81,7 +81,7 @@ jobs:
     
     - name: Check for vulnerable dependencies
       run: |
-        safety check
+        pip-audit --strict
     
     - name: Detect hardcoded secrets
       uses: gitleaks/gitleaks-action@v2
