@@ -86,7 +86,7 @@ def test_delete_user():
     """
     # First create a user
     create_response = client.post(
-        "/use/", 
+        "/users/", 
         json={
             "username": "deleteuser", 
             "email": "delete@example.com", 
