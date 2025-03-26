@@ -10,8 +10,6 @@ jobs:
   test-and-secure:
     runs-on: ubuntu-latest
     
-    continue-on-error: true  # Job-level continue-on-error
-
     services:
       mariadb:
         image: mariadb:10.11
@@ -59,7 +57,6 @@ jobs:
       run: |
         mariadb -h 127.0.0.1 -u root -prootpassword -e "SHOW DATABASES;"
         mariadb -h 127.0.0.1 -u root -prootpassword user_management -e "SELECT 1;"
-      continue-on-error: true  # Step-level continue-on-error
     
     - name: Install dependencies
       run: |
@@ -77,12 +74,10 @@ jobs:
     - name: Run unit tests
       run: |
         pytest tests/
-      continue-on-error: true  # Step-level continue-on-error
     
     - name: Run static analysis with Bandit
       run: |
         bandit -r app/ -f custom
-      continue-on-error: true  # Step-level continue-on-error
     
     - name: Check for vulnerable dependencies
       run: |
@@ -93,4 +88,3 @@ jobs:
       uses: gitleaks/gitleaks-action@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      continue-on-error: true  # Step-level continue-on-error
