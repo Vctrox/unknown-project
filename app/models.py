@@ -1,4 +1,6 @@
 # app/models.py
+
+# import necessary libraries
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import declarative_base
 from pydantic import BaseModel, EmailStr, constr

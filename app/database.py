@@ -1,4 +1,6 @@
 # app/database.py
+
+# import necessary libraries
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
